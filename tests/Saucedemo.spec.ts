@@ -1,25 +1,39 @@
 import { test, expect } from '@playwright/test';
 
-test('Uspješni login', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-  await page.locator('[data-test="username"]').click();
-  await page.locator('[data-test="username"]').fill('standard_user');
-  await page.locator('[data-test="password"]').click();
-  await page.locator('[data-test="password"]').fill('secret_sauce');
-  await page.locator('[data-test="login-button"]').click();
-  await expect(page.locator('[data-test="title"]')).toContainText('Products');
-  await expect(page.locator('[data-test="item-4-title-link"] [data-test="inventory-item-name"]')).toMatchAriaSnapshot(`- text: Sauce Labs Backpack`);
-});
+test.describe('Login', () => {
 
-test('Neuspješni login', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-  await page.locator('[data-test="username"]').click();
-  await page.locator('[data-test="username"]').fill('standard_user');
-  await page.locator('[data-test="password"]').click();
-  await page.locator('[data-test="password"]').fill('secreeeet_sauce');
-  await page.locator('[data-test="login-button"]').click();
-  await expect(page.locator('[data-test="error"]')).toContainText('Epic sadface: Username and password do not match any user in this service');
-});
+  test('Successful login', async ({ page }) => {
+    await page.goto('https://www.saucedemo.com/');
+    await page.locator('[data-test="username"]').click();
+    await page.locator('[data-test="username"]').fill('standard_user');
+    await page.locator('[data-test="password"]').click();
+    await page.locator('[data-test="password"]').fill('secret_sauce');
+    await page.locator('[data-test="login-button"]').click();
+    await expect(page.locator('[data-test="title"]')).toContainText('Products');
+    await expect(page.locator('[data-test="item-4-title-link"] [data-test="inventory-item-name"]')).toMatchAriaSnapshot(`- text: Sauce Labs Backpack`);
+  });
+  
+  test('Unsuccessful login', async ({ page }) => {
+    await page.goto('https://www.saucedemo.com/');
+    await page.locator('[data-test="username"]').click();
+    await page.locator('[data-test="username"]').fill('standard_user');
+    await page.locator('[data-test="password"]').click();
+    await page.locator('[data-test="password"]').fill('secreeeet_sauce');
+    await page.locator('[data-test="login-button"]').click();
+    await expect(page.locator('[data-test="error"]')).toContainText('Epic sadface: Username and password do not match any user in this service');
+  });
+  
+  test('Locked out user login', async ({ page }) => {
+    await page.goto('https://www.saucedemo.com/');
+    await page.locator('[data-test="username"]').click();
+    await page.locator('[data-test="username"]').fill('locked_out_user');
+    await page.locator('[data-test="password"]').click();
+    await page.locator('[data-test="password"]').fill('secret_sauce');
+    await page.locator('[data-test="login-button"]').click();
+    await expect(page.locator('[data-test="error"]')).toContainText('Epic sadface: Sorry, this user has been locked out.');
+  });
+  
+  });
 
 test.beforeEach(async ({ page }) => {
   await page.goto('https://www.saucedemo.com/');
@@ -55,4 +69,25 @@ test.beforeEach(async ({ page }) => {
     await page.locator('[data-test="product-sort-container"]').selectOption('hilo');
     await expect(page.locator('[data-test="item-5-title-link"] [data-test="inventory-item-name"]')).toContainText('Sauce Labs Fleece Jacket');
     await expect(page.locator('[data-test="inventory-list"]')).toContainText('$49.99');
+    });
+
+    test('Remove button', async ({ page }) => {
+      await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+      await expect(page.locator('[data-test="remove-sauce-labs-backpack"]')).toContainText('Remove');
+      await expect(page.locator('[data-test="product-sort-container"]')).toHaveValue('az');
+      await expect(page.locator('[data-test="shopping-cart-badge"]')).toMatchAriaSnapshot(`- text: "1"`);
+      await page.locator('[data-test="remove-sauce-labs-backpack"]').click();
+      await expect(page.locator('[data-test="add-to-cart-sauce-labs-backpack"]')).toContainText('Add to cart');
+    });
+
+    test('Correct image', async ({ page }) => {
+      await expect(page.locator('img[alt="Sauce Labs Backpack"]')).toHaveAttribute('src', "/static/media/sauce-backpack-1200x1500.0a0b85a3.jpg");
+    });
+
+    test('Price check', async ({ page }) => {
+      await expect(page.locator('[data-test="item-4-title-link"] [data-test="inventory-item-name"]')).toContainText('Sauce Labs Backpack');
+      await expect(page.locator('[data-test="inventory-list"]')).toContainText('$29.99');
+      await page.locator('[data-test="item-4-title-link"]').click();
+      await expect(page.locator('[data-test="inventory-item-name"]')).toContainText('Sauce Labs Backpack');
+      await expect(page.locator('[data-test="inventory-item-price"]')).toContainText('$29.99');
     });
