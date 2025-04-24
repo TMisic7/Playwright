@@ -82,12 +82,34 @@ test.beforeEach(async ({ page }) => {
 
     test('Correct image', async ({ page }) => {
       await expect(page.locator('img[alt="Sauce Labs Backpack"]')).toHaveAttribute('src', "/static/media/sauce-backpack-1200x1500.0a0b85a3.jpg");
+      await page.getByRole('button', { name: 'Open Menu' }).click();
+      await page.locator('[data-test="logout-sidebar-link"]').click();
+      await page.locator('[data-test="username"]').click();
+      await page.locator('[data-test="username"]').fill('visual_user');
+      await page.locator('[data-test="password"]').click();
+      await page.locator('[data-test="password"]').fill('secret_sauce');
+      await page.locator('[data-test="login-button"]').click();
+      await expect(page.locator('img[alt="Sauce Labs Backpack"]')).toHaveAttribute('src', "/static/media/sauce-backpack-1200x1500.0a0b85a3.jpg");
     });
 
-    test('Price check', async ({ page }) => {
+    test('Price check - standard user', async ({ page }) => {
       await expect(page.locator('[data-test="item-4-title-link"] [data-test="inventory-item-name"]')).toContainText('Sauce Labs Backpack');
       await expect(page.locator('[data-test="inventory-list"]')).toContainText('$29.99');
       await page.locator('[data-test="item-4-title-link"]').click();
       await expect(page.locator('[data-test="inventory-item-name"]')).toContainText('Sauce Labs Backpack');
       await expect(page.locator('[data-test="inventory-item-price"]')).toContainText('$29.99');
+    });
+
+    test('Price check - error user', async ({ page }) => {
+      await expect(page.locator('[data-test="item-4-title-link"] [data-test="inventory-item-name"]')).toContainText('Sauce Labs Backpack');
+      await expect(page.locator('[data-test="inventory-list"]')).toContainText('$29.99');
+      await page.getByRole('button', { name: 'Open Menu' }).click();
+      await page.locator('[data-test="logout-sidebar-link"]').click();
+      await page.locator('[data-test="username"]').click();
+      await page.locator('[data-test="username"]').fill('visual_user');
+      await page.locator('[data-test="password"]').click();
+      await page.locator('[data-test="password"]').fill('secret_sauce');
+      await page.locator('[data-test="login-button"]').click();
+      await expect(page.locator('[data-test="item-4-title-link"] [data-test="inventory-item-name"]')).toContainText('Sauce Labs Backpack');
+      await expect(page.locator('[data-test="inventory-list"]')).toContainText('$29.99');
     });
