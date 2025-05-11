@@ -1,10 +1,10 @@
 # Test Summary
 
-These tests test [this page](https://www.saucedemo.com/)
+These tests are end-to-end tests written in Playwright that test [Swag Labs](https://www.saucedemo.com/), a demo web shop. The suite tests the main user flows of the application, including login, product browsing and details, cart management, and checkout related actions.
 
 # How to Run the Project
 After cloning the repository, to run the project:
-* Install Playwright with this command: "npx playwright install" in your favourite IDE (e.g. VS Code)
+* Install Playwright with this command: "npx playwright install" in your favourite IDE (e.g. VS Code), or in a terminal.
 
 # How to run tests
 To execute all test cases enter: "npx playwright test"
